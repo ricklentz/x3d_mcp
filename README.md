@@ -67,6 +67,15 @@ x3d_mcp/
     validation/
       validate.py          # XSD + JSON validation pipeline
       schemas/             # Bundled x3d-4.0.xsd, x3d-4.0.dtd, X3DUOM
+  dataset/
+    schema.py              # Canonical training example schema, normalization
+    normalize.py           # JSONL schema normalization CLI
+    validate_schema.py     # JSONL schema validation CLI
+    augment.py             # Tunable augmentation pipeline CLI
+    filter.py              # Dataset filter/split by source and token budget
+    generate.py            # Numeric sequence example generator CLI
+    generators/
+      numeric_sequences.py # IndexedFaceSet, Extrusion, Interpolator generators
   tests/
   output/
     logs/                  # Container logs per issue number
@@ -122,6 +131,49 @@ x3d_mcp/
 | `describe_node` | Get full field definitions for a node type: field names, types, defaults, ranges, access types. |
 | `list_components` | List all X3D components with their support levels. |
 | `list_profiles` | List available profiles and their component requirements. |
+
+## Dataset Pipeline
+
+Tools for building, normalizing, augmenting, and generating X3D training data for fine-tuning.
+
+### Schema Normalization
+
+Normalize mixed-type metadata fields to a consistent schema:
+
+```bash
+python -m dataset.normalize input.jsonl output.jsonl --report
+python -m dataset.validate_schema input.jsonl
+```
+
+### Augmentation
+
+Tunable augmentation with configurable instruction diversity, X3D mutation, and token budget:
+
+```bash
+python -m dataset.augment base.jsonl augmented.jsonl \
+    --ratio 5 --seed 42 \
+    --instruction-diversity 0.5 \
+    --x3d-mutation 0.3 \
+    --max-tokens 8192
+```
+
+### Filtering
+
+Filter by source (original/augmented) and token budget:
+
+```bash
+python -m dataset.filter input.jsonl output.jsonl --source original --max-tokens 8192
+```
+
+### Numeric Sequence Generation
+
+Generate training examples targeting long numeric arrays (IndexedFaceSet, Extrusion, Interpolator):
+
+```bash
+python -m dataset.generate output.jsonl \
+    --type all --count 50 --complexity mixed \
+    --validate --seed 42
+```
 
 ## X3D Standard Reference
 
