@@ -1,0 +1,217 @@
+# x3d_mcp
+
+MCP server for generating, validating, and converting valid X3D content. Built on the official Web3D Consortium toolchain.
+
+## Overview
+
+x3d_mcp exposes X3D capabilities to LLMs via the Model Context Protocol (MCP). It generates spec-compliant X3D scenes in XML, JSON, and ClassicVRML encodings, with full validation against the ISO/IEC 19775 standard.
+
+LLMs have spatial and visual understanding of 3D space. X3D (Extensible 3D) provides a declarative, XML-based means to express that understanding as valid, interoperable 3D content. This server bridges the two.
+
+**No X3D MCP server exists in the ecosystem.** This is the first.
+
+## Design Decisions
+
+### Language: Python
+
+- **`x3d.py`** (PyPI `x3d` v4.0.65, BSD-3) -- official Web3D Consortium package, auto-generated from X3DUOM
+- **`lxml`** -- XSD and ISO-Schematron validation, 42x faster than pure-Python alternatives
+- **`FastMCP`** (PyPI `mcp`) -- official Anthropic MCP SDK, decorator-based tool registration
+- All dependencies are BSD/MIT licensed. No GPL concerns.
+
+### Two Operating Modes
+
+**Workflow Mode** -- high-level tools for end-to-end scene generation. The LLM describes what it wants; the server handles construction, validation, and serialization. Fewer tool calls, higher reliability.
+
+**Granular Mode** -- low-level tools for node-by-node scene construction. The LLM builds the scene graph incrementally: create nodes, set fields, add children, define routes. Full control for complex or iterative workflows.
+
+Both modes validate output before returning it.
+
+### XSLT-Based JSON Conversion
+
+JSON encoding uses the Web3D Consortium's `X3dToJson.xslt` stylesheet, which is mature and production-tested against thousands of example models. Round-trip fidelity (XML to JSON to XML) is guaranteed. No custom JSON serializer.
+
+### Validation Pipeline
+
+Four layers, matching the X3D specification's own validation hierarchy:
+
+1. **Type checking at generation time** -- `x3d.py` enforces field types, ranges, and enumerations during scene construction
+2. **XSD validation** -- `lxml.etree.XMLSchema` against `x3d-4.0.xsd`
+3. **Schematron semantic checks** -- DEF-before-USE ordering, interpolator key/keyValue array matching, coordIndex bounds checking, ROUTE field existence
+4. **Profile/component conformance** -- declared profile must support all nodes used
+
+### X3DUOM as Foundation
+
+The `X3dUnifiedObjectModel-4.0.xml` (X3DUOM) is the single source of truth for all 260 concrete nodes, 72 abstract types, 87 simple types, and 17 statements. It is parsed at build time to generate:
+
+- Node/field metadata lookup tables
+- containerField mapping rules
+- Enumeration value sets
+- Default value tables
+- Inheritance hierarchy
+
+## Architecture
+
+```
+x3d_mcp/
+  src/
+    server.py              # FastMCP server, tool registration
+    tools/
+      workflow.py          # High-level scene generation tools
+      granular.py          # Low-level node manipulation tools
+      validate.py          # Validation pipeline (XSD + Schematron)
+      convert.py           # Encoding conversion (XML, JSON, VRML)
+      query.py             # Node/field metadata queries
+    x3d/
+      scene.py             # Scene graph state management
+      builder.py           # X3D scene construction using x3d.py
+      x3duom.py            # X3DUOM parser, node/field metadata
+    validation/
+      schemas/             # Bundled x3d-4.0.xsd, x3d-4.0.dtd
+      schematron/          # Bundled X3dSchematronValidityChecks
+      stylesheets/         # X3dToJson.xslt, SvrlReportText.xslt
+  tests/
+  output/
+    logs/                  # Container logs per issue number
+  docs/                    # Research and reference documentation
+  Dockerfile
+  docker-compose.yml
+  pyproject.toml
+  README.md
+```
+
+## MCP Tools
+
+### Workflow Tools
+
+| Tool | Description |
+|------|-------------|
+| `create_scene` | Generate a complete X3D scene from a natural language description. Returns validated X3D in the requested encoding (xml, json, vrml). |
+| `create_geometry` | Generate a single geometric object with material, transform, and optional animation. |
+| `compose_scene` | Combine multiple objects, lights, viewpoints, and backgrounds into a complete scene. |
+
+### Granular Tools
+
+| Tool | Description |
+|------|-------------|
+| `create_node` | Create an X3D node by type name. Returns a node handle for further manipulation. |
+| `set_field` | Set a field value on a node (with type validation). |
+| `add_child` | Add a child node to a parent (validates containerField rules). |
+| `add_route` | Create a ROUTE between two node fields (validates field existence and type compatibility). |
+| `def_node` | Assign a DEF name to a node. |
+| `use_node` | Reference a previously DEF'd node via USE. |
+| `remove_node` | Remove a node from the scene graph. |
+| `get_scene` | Serialize the current scene state to X3D (xml, json, or vrml). |
+
+### Validation Tools
+
+| Tool | Description |
+|------|-------------|
+| `validate_x3d` | Validate an X3D document (XML string or JSON string) against XSD schema and Schematron rules. Returns pass/fail with detailed error messages. |
+| `validate_scene` | Validate the current in-memory scene without serializing first. |
+
+### Conversion Tools
+
+| Tool | Description |
+|------|-------------|
+| `convert_x3d` | Convert X3D between encodings: xml, json, vrml. Uses X3dToJson.xslt for XML-to-JSON. |
+
+### Query Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_nodes` | List available X3D nodes, optionally filtered by component. |
+| `describe_node` | Get full field definitions for a node type: field names, types, defaults, ranges, access types. |
+| `list_components` | List all X3D components with their support levels. |
+| `list_profiles` | List available profiles and their component requirements. |
+
+## X3D Standard Reference
+
+This server targets **X3D version 4.0** (ISO/IEC 19775-1:2023).
+
+### Supported Encodings
+
+| Encoding | Extension | Spec |
+|----------|-----------|------|
+| XML | `.x3d` | ISO/IEC 19776-1 |
+| JSON | `.x3dj` | ISO/IEC 19776-5 |
+| ClassicVRML | `.x3dv` | ISO/IEC 19776-2 |
+
+### Profiles
+
+Default profile is `Interchange` (static geometry, textures, lighting, navigation). Automatically upgraded to `Immersive` or `Full` when the scene uses sensors, animation, scripting, or advanced components.
+
+| Profile | Use Case |
+|---------|----------|
+| Core | Minimal baseline |
+| Interchange | Asset sharing, static 3D models |
+| Interactive | User interaction, basic behaviors |
+| Immersive | Sensors, animation, scripting, physics |
+| Full | Everything |
+| CADInterchange | Engineering / product design |
+
+### Key Components (37 total)
+
+Geometry3D, Shape, Grouping, Rendering, Lighting, Texturing, Navigation, EnvironmentalEffects, Interpolation, PointingDeviceSensor, EnvironmentalSensor, KeyDeviceSensor, EventUtilities, Sound, Text, Scripting, Shaders, NURBS, Geospatial, HAnim, CADGeometry, RigidBodyPhysics, ParticleSystems, VolumeRendering, Followers, Picking, Layering, Layout, Texturing3D, CubeMapTexturing, TextureProjection, Annotation, DIS, Core, Time, Networking, Geometry2D.
+
+Full node reference: [docs/x3d-node-reference.md](docs/x3d-node-reference.md)
+
+## Validation Resources
+
+Bundled from the Web3D Consortium:
+
+| Resource | Source |
+|----------|--------|
+| `x3d-4.0.xsd` | https://www.web3d.org/specifications/x3d-4.0.xsd |
+| `x3d-4.0.dtd` | https://www.web3d.org/specifications/x3d-4.0.dtd |
+| `X3dUnifiedObjectModel-4.0.xml` | https://www.web3d.org/specifications/X3dUnifiedObjectModel-4.0.xml |
+| `X3dSchematronValidityChecks.xslt` | https://www.web3d.org/x3d/tools/schematron/X3dSchematron.html |
+| `X3dToJson.xslt` | https://www.web3d.org/x3d/stylesheets/X3dToJson.xslt |
+| `x3d-3.3-JSONSchema.json` | https://www.web3d.org/specifications/x3d-3.3-JSONSchema.json |
+
+## Dependencies
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `mcp` | >=1.7 | MCP SDK (FastMCP) |
+| `x3d` | >=4.0.65 | Official X3D scene construction and type validation |
+| `lxml` | >=6.0 | XSD validation, Schematron validation, XSLT transforms |
+| `xmlschema` | >=4.3 | Pure-Python XSD validation (fallback) |
+| `jsonschema` | >=4.26 | JSON Schema validation for X3D JSON encoding |
+
+## Docker
+
+All code lives on the host. Docker is used for testing and validation only.
+
+```bash
+docker compose up --build
+```
+
+The container mounts `src/` and `tests/` from the host. Logs are written to `output/logs/`.
+
+## Reference Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/x3d-standard-overview.md](docs/x3d-standard-overview.md) | ISO standards, scene graph architecture, profiles, components, field types, execution model |
+| [docs/x3d-file-structure.md](docs/x3d-file-structure.md) | Minimal valid files (XML/JSON/VRML), DOCTYPE declarations, encoding rules, 4-layer validation |
+| [docs/x3d-node-reference.md](docs/x3d-node-reference.md) | All ~260 nodes organized by component with descriptions |
+| [docs/x3d-examples.md](docs/x3d-examples.md) | Code patterns from hello world through PBR and animation. Links to 4,142+ Web3D example scenes |
+| [docs/x3d-tools-and-references.md](docs/x3d-tools-and-references.md) | URLs for schemas, DTDs, X3DUOM, validators, viewers, converters, libraries |
+| [docs/x3d-validation-strategy.md](docs/x3d-validation-strategy.md) | Validation approach: X3DUOM parsing, XSD, Schematron, containerField rules |
+| [docs/ecosystem-research.md](docs/ecosystem-research.md) | Survey of existing tools, Python vs TypeScript analysis, community resources |
+
+## External References
+
+- X3D Specification (v4.0): https://www.web3d.org/specifications/X3Dv4Draft/ISO-IEC19775-1v4-WD2/Part01/Architecture.html
+- X3D Tooltips: https://www.web3d.org/x3d/tooltips/X3dTooltips.html
+- X3D Examples Archive: https://www.web3d.org/x3d/content/examples/X3dForAdvancedModeling/
+- X3D Resources: https://www.web3d.org/x3d/content/examples/X3dResources.html
+- X3D Schemas and DTDs: https://www.web3d.org/specifications/
+- X3D Unified Object Model: https://www.web3d.org/specifications/X3DUOM.html
+- X3D Schematron QA: https://www.web3d.org/x3d/tools/schematron/X3dSchematron.html
+- X3D JSON Encoding (19776-5): https://www.web3d.org/documents/specifications/19776-5/V3.3/Part05/concepts.html
+- x3d.py Python Package: https://www.web3d.org/x3d/stylesheets/python/python.html
+- MCP Specification: https://modelcontextprotocol.io/specification/2025-11-25
+- FastMCP Documentation: https://gofastmcp.com/servers/tools
+- Web3D Consortium: https://www.web3d.org
