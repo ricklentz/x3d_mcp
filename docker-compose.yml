@@ -1,0 +1,7 @@
+services:
+  app:
+    build: .
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./output:/app/output

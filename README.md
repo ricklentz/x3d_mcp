@@ -27,18 +27,17 @@ LLMs have spatial and visual understanding of 3D space. X3D (Extensible 3D) prov
 
 Both modes validate output before returning it.
 
-### XSLT-Based JSON Conversion
+### JSON Conversion
 
-JSON encoding uses the Web3D Consortium's `X3dToJson.xslt` stylesheet, which is mature and production-tested against thousands of example models. Round-trip fidelity (XML to JSON to XML) is guaranteed. No custom JSON serializer.
+JSON and ClassicVRML encoding uses `x3d.py`'s built-in `.JSON()` and `.VRML()` serialization methods. These are auto-generated from X3DUOM and produce spec-compliant output directly. The Web3D Consortium's `X3dToJson.xslt` is XSLT 2.0, which is incompatible with lxml (XSLT 1.0 only), so we use the native Python serialization instead.
 
 ### Validation Pipeline
 
-Four layers, matching the X3D specification's own validation hierarchy:
+Three layers, matching the X3D specification's own validation hierarchy:
 
 1. **Type checking at generation time** -- `x3d.py` enforces field types, ranges, and enumerations during scene construction
-2. **XSD validation** -- `lxml.etree.XMLSchema` against `x3d-4.0.xsd`
-3. **Schematron semantic checks** -- DEF-before-USE ordering, interpolator key/keyValue array matching, coordIndex bounds checking, ROUTE field existence
-4. **Profile/component conformance** -- declared profile must support all nodes used
+2. **XSD validation** -- `lxml.etree.XMLSchema` against `x3d-4.0.xsd` (bundled with companion schemas)
+3. **JSON structural validation** -- checks for required X3D root, @version, @profile, and Scene keys
 
 ### X3DUOM as Foundation
 
@@ -59,17 +58,15 @@ x3d_mcp/
     tools/
       workflow.py          # High-level scene generation tools
       granular.py          # Low-level node manipulation tools
-      validate.py          # Validation pipeline (XSD + Schematron)
+      validate_tool.py     # Validation MCP tool wrappers
       convert.py           # Encoding conversion (XML, JSON, VRML)
       query.py             # Node/field metadata queries
-    x3d/
+    x3d_utils/
       scene.py             # Scene graph state management
-      builder.py           # X3D scene construction using x3d.py
       x3duom.py            # X3DUOM parser, node/field metadata
     validation/
-      schemas/             # Bundled x3d-4.0.xsd, x3d-4.0.dtd
-      schematron/          # Bundled X3dSchematronValidityChecks
-      stylesheets/         # X3dToJson.xslt, SvrlReportText.xslt
+      validate.py          # XSD + JSON validation pipeline
+      schemas/             # Bundled x3d-4.0.xsd, x3d-4.0.dtd, X3DUOM
   tests/
   output/
     logs/                  # Container logs per issue number
@@ -102,19 +99,20 @@ x3d_mcp/
 | `use_node` | Reference a previously DEF'd node via USE. |
 | `remove_node` | Remove a node from the scene graph. |
 | `get_scene` | Serialize the current scene state to X3D (xml, json, or vrml). |
+| `reset_scene` | Clear all nodes and reset the scene to empty state. |
 
 ### Validation Tools
 
 | Tool | Description |
 |------|-------------|
-| `validate_x3d` | Validate an X3D document (XML string or JSON string) against XSD schema and Schematron rules. Returns pass/fail with detailed error messages. |
-| `validate_scene` | Validate the current in-memory scene without serializing first. |
+| `validate_x3d` | Validate an X3D document (XML or JSON) against the XSD schema. Returns pass/fail with detailed error messages. |
+| `validate_current_scene` | Validate the current granular scene against the XSD schema. |
 
 ### Conversion Tools
 
 | Tool | Description |
 |------|-------------|
-| `convert_x3d` | Convert X3D between encodings: xml, json, vrml. Uses X3dToJson.xslt for XML-to-JSON. |
+| `convert_x3d` | Convert X3D between encodings: xml, json, vrml. Uses x3d.py native serialization. |
 
 ### Query Tools
 
@@ -158,16 +156,16 @@ Full node reference: [docs/x3d-node-reference.md](docs/x3d-node-reference.md)
 
 ## Validation Resources
 
-Bundled from the Web3D Consortium:
+Bundled from the Web3D Consortium in `src/validation/schemas/`:
 
 | Resource | Source |
 |----------|--------|
 | `x3d-4.0.xsd` | https://www.web3d.org/specifications/x3d-4.0.xsd |
+| `x3d-4.0-Web3dExtensionsPublic.xsd` | https://www.web3d.org/specifications/x3d-4.0-Web3dExtensionsPublic.xsd |
+| `x3d-4.0-Web3dExtensionsPrivate.xsd` | https://www.web3d.org/specifications/x3d-4.0-Web3dExtensionsPrivate.xsd |
+| `xmldsig-core-schema.xsd` | https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd |
 | `x3d-4.0.dtd` | https://www.web3d.org/specifications/x3d-4.0.dtd |
 | `X3dUnifiedObjectModel-4.0.xml` | https://www.web3d.org/specifications/X3dUnifiedObjectModel-4.0.xml |
-| `X3dSchematronValidityChecks.xslt` | https://www.web3d.org/x3d/tools/schematron/X3dSchematron.html |
-| `X3dToJson.xslt` | https://www.web3d.org/x3d/stylesheets/X3dToJson.xslt |
-| `x3d-3.3-JSONSchema.json` | https://www.web3d.org/specifications/x3d-3.3-JSONSchema.json |
 
 ## Dependencies
 
