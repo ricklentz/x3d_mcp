@@ -206,19 +206,6 @@ Geometry3D, Shape, Grouping, Rendering, Lighting, Texturing, Navigation, Environ
 
 Full node reference: [docs/x3d-node-reference.md](docs/x3d-node-reference.md)
 
-## Validation Resources
-
-Bundled from the Web3D Consortium in `src/validation/schemas/`:
-
-| Resource | Source |
-|----------|--------|
-| `x3d-4.0.xsd` | https://www.web3d.org/specifications/x3d-4.0.xsd |
-| `x3d-4.0-Web3dExtensionsPublic.xsd` | https://www.web3d.org/specifications/x3d-4.0-Web3dExtensionsPublic.xsd |
-| `x3d-4.0-Web3dExtensionsPrivate.xsd` | https://www.web3d.org/specifications/x3d-4.0-Web3dExtensionsPrivate.xsd |
-| `xmldsig-core-schema.xsd` | https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd |
-| `x3d-4.0.dtd` | https://www.web3d.org/specifications/x3d-4.0.dtd |
-| `X3dUnifiedObjectModel-4.0.xml` | https://www.web3d.org/specifications/X3dUnifiedObjectModel-4.0.xml |
-
 ## Dependencies
 
 | Package | Version | Purpose |
@@ -254,7 +241,8 @@ The container mounts `src/` and `tests/` from the host. Logs are written to `out
 ## External References
 
 - X3D Specification (v4.0): https://www.web3d.org/specifications/X3Dv4Draft/ISO-IEC19775-1v4-WD2/Part01/Architecture.html
-- X3D Tooltips: https://www.web3d.org/x3d/tooltips/X3dTooltips.html
+- X3D Tooltips (HTML): https://www.web3d.org/x3d/tooltips/X3dTooltips.html
+- X3D Tooltips Profile (XML): https://www.web3d.org/x3d/tooltips/x3d-4.0.profile.xml
 - X3D Examples Archive: https://www.web3d.org/x3d/content/examples/X3dForAdvancedModeling/
 - X3D Resources: https://www.web3d.org/x3d/content/examples/X3dResources.html
 - X3D Schemas and DTDs: https://www.web3d.org/specifications/

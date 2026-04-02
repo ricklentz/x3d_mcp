@@ -42,13 +42,12 @@ def register(mcp: FastMCP):
             node_type: The node type name (e.g. "Box", "Material", "Transform").
         """
         uom = get_x3duom()
-        nodes = uom.get_concrete_nodes()
-        if node_type not in nodes:
+        enriched = uom.get_enriched_node(node_type)
+        if enriched is None:
             return json.dumps({"error": f"Unknown node type: {node_type}"})
 
-        info = nodes[node_type]
         fields = []
-        for f in info["fields"]:
+        for f in enriched["fields"]:
             field_info = {
                 "name": f["name"],
                 "type": f["type"],
@@ -65,16 +64,34 @@ def register(mcp: FastMCP):
                 field_info["minInclusive"] = f["minInclusive"]
             if f.get("maxInclusive"):
                 field_info["maxInclusive"] = f["maxInclusive"]
+            if f.get("tooltip"):
+                field_info["tooltip"] = f["tooltip"]
+            if f.get("hints"):
+                field_info["hints"] = f["hints"]
+            if f.get("warnings"):
+                field_info["warnings"] = f["warnings"]
+            if f.get("specUrls"):
+                field_info["specUrls"] = f["specUrls"]
             fields.append(field_info)
 
-        return json.dumps({
+        result = {
             "name": node_type,
-            "component": info["component"],
-            "level": info["level"],
-            "baseType": info["baseType"],
-            "containerField": info["containerField"],
+            "component": enriched["component"],
+            "level": enriched["level"],
+            "baseType": enriched["baseType"],
+            "containerField": enriched["containerField"],
             "fields": fields,
-        }, indent=2)
+        }
+        if enriched.get("tooltip"):
+            result["tooltip"] = enriched["tooltip"]
+        if enriched.get("hints"):
+            result["hints"] = enriched["hints"]
+        if enriched.get("warnings"):
+            result["warnings"] = enriched["warnings"]
+        if enriched.get("specUrls"):
+            result["specUrls"] = enriched["specUrls"]
+
+        return json.dumps(result, indent=2)
 
     @mcp.tool()
     def list_components() -> str:

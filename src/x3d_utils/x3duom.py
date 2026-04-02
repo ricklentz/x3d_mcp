@@ -148,6 +148,87 @@ class X3DUOM:
             return None
         return node["containerField"]
 
+    def get_enriched_node(self, node_name: str) -> dict | None:
+        """Return node info with tooltip data merged into fields."""
+        from x3d_utils.tooltips import get_tooltips
+
+        nodes = self.get_concrete_nodes()
+        node = nodes.get(node_name)
+        if node is None:
+            return None
+
+        tips = get_tooltips()
+        node_tip = tips.get_node_tooltip(node_name)
+
+        result = dict(node)
+        if node_tip:
+            result["tooltip"] = node_tip["description"]
+            result["hints"] = node_tip["hints"]
+            result["warnings"] = node_tip["warnings"]
+            result["specUrls"] = node_tip["specUrls"]
+        else:
+            result["tooltip"] = ""
+            result["hints"] = []
+            result["warnings"] = []
+            result["specUrls"] = []
+
+        enriched_fields = []
+        for f in node["fields"]:
+            ef = dict(f)
+            if node_tip:
+                field_tip = node_tip["fields"].get(f["name"])
+                if field_tip:
+                    ef["tooltip"] = field_tip["description"]
+                    ef["hints"] = field_tip["hints"]
+                    ef["warnings"] = field_tip["warnings"]
+                    ef["specUrls"] = field_tip["specUrls"]
+                else:
+                    ef["tooltip"] = ""
+                    ef["hints"] = []
+                    ef["warnings"] = []
+                    ef["specUrls"] = []
+            else:
+                ef["tooltip"] = ""
+                ef["hints"] = []
+                ef["warnings"] = []
+                ef["specUrls"] = []
+            enriched_fields.append(ef)
+        result["fields"] = enriched_fields
+        return result
+
+    def get_coverage_report(self) -> dict:
+        """Compare X3DUOM nodes/fields with tooltips. Returns drift report."""
+        from x3d_utils.tooltips import get_tooltips
+
+        tips = get_tooltips()
+        tip_nodes = tips.get_nodes()
+        uom_nodes = self.get_concrete_nodes()
+
+        uom_only = sorted(set(uom_nodes.keys()) - set(tip_nodes.keys()))
+        tips_only = sorted(set(tip_nodes.keys()) - set(uom_nodes.keys()))
+        common = sorted(set(uom_nodes.keys()) & set(tip_nodes.keys()))
+
+        field_drift = {}
+        for node_name in common:
+            uom_fields = {f["name"] for f in uom_nodes[node_name]["fields"]}
+            tip_fields = set(tip_nodes[node_name]["fields"].keys())
+            uom_only_fields = sorted(uom_fields - tip_fields)
+            tip_only_fields = sorted(tip_fields - uom_fields)
+            if uom_only_fields or tip_only_fields:
+                field_drift[node_name] = {
+                    "uom_only": uom_only_fields,
+                    "tips_only": tip_only_fields,
+                }
+
+        return {
+            "uom_node_count": len(uom_nodes),
+            "tips_node_count": len(tip_nodes),
+            "common_nodes": len(common),
+            "uom_only_nodes": uom_only,
+            "tips_only_nodes": tips_only,
+            "field_drift": field_drift,
+        }
+
     def _parse_fields(self, idef: etree._Element) -> list[dict]:
         """Extract field definitions from an InterfaceDefinition element."""
         fields = []
