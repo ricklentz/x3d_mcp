@@ -6,6 +6,7 @@ COPY pyproject.toml .
 COPY src/ src/
 COPY tests/ tests/
 COPY dataset/ dataset/
+COPY examples/ examples/
 
 RUN pip install --no-cache-dir ".[dev]"
 

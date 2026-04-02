@@ -5,4 +5,5 @@ services:
       - ./src:/app/src
       - ./tests:/app/tests
       - ./dataset:/app/dataset
+      - ./examples:/app/examples
       - ./output:/app/output
