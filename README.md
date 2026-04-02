@@ -17,7 +17,7 @@ LLMs have spatial and visual understanding of 3D space. X3D (Extensible 3D) prov
 - **`x3d.py`** (PyPI `x3d` v4.0.65, BSD-3) -- official Web3D Consortium package, auto-generated from X3DUOM
 - **`lxml`** -- XSD and ISO-Schematron validation, 42x faster than pure-Python alternatives
 - **`FastMCP`** (PyPI `mcp`) -- official Anthropic MCP SDK, decorator-based tool registration
-- All dependencies are BSD/MIT licensed. No GPL concerns.
+- All dependencies are BSD/MIT licensed. Project uses [Web3D Consortium Open-Source License](https://www.web3d.org/license).
 
 ### Two Operating Modes
 
@@ -254,3 +254,7 @@ The container mounts `src/` and `tests/` from the host. Logs are written to `out
 - MCP Specification: https://modelcontextprotocol.io/specification/2025-11-25
 - FastMCP Documentation: https://gofastmcp.com/servers/tools
 - Web3D Consortium: https://www.web3d.org
+
+## License
+
+[Web3D Consortium Open-Source License](https://www.web3d.org/license) -- see [LICENSE](LICENSE).
