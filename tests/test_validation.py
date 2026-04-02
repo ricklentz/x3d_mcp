@@ -10,7 +10,7 @@ from validation.validate import validate_xml, validate_json
 
 def test_valid_minimal_scene():
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0">
+<X3D profile="Interchange" version="4.1">
   <Scene>
     <Shape>
       <Appearance>
@@ -27,7 +27,7 @@ def test_valid_minimal_scene():
 
 def test_valid_scene_with_xsi():
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0"
+<X3D profile="Interchange" version="4.1"
      xmlns:xsd="https://www.w3.org/2001/XMLSchema-instance"
      xsd:noNamespaceSchemaLocation="https://www.web3d.org/specifications/x3d-4.0.xsd">
   <Scene>
@@ -42,7 +42,7 @@ def test_valid_scene_with_xsi():
 
 def test_invalid_unknown_node():
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0">
+<X3D profile="Interchange" version="4.1">
   <Scene>
     <FakeNode/>
   </Scene>
@@ -60,7 +60,7 @@ def test_invalid_malformed_xml():
 
 def test_invalid_missing_profile():
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<X3D version="4.0">
+<X3D version="4.1">
   <Scene/>
 </X3D>"""
     result = validate_xml(xml)

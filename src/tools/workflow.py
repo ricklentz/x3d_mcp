@@ -45,7 +45,7 @@ def register(mcp: FastMCP):
         """
         model = X3D(
             profile=profile,
-            version="4.0",
+            version="4.1",
             head=head(children=[
                 meta(name="title", content=description),
             ]),
@@ -113,7 +113,7 @@ def register(mcp: FastMCP):
 
         model = X3D(
             profile="Interchange",
-            version="4.0",
+            version="4.1",
             Scene=Scene(children=[scene_child]),
         )
         return _serialize(model, encoding)
@@ -225,7 +225,7 @@ def register(mcp: FastMCP):
 
         model = X3D(
             profile="Interchange",
-            version="4.0",
+            version="4.1",
             Scene=Scene(children=scene_children),
         )
         return _serialize(model, encoding)

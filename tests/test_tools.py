@@ -14,7 +14,7 @@ def test_workflow_create_scene():
     from x3d.x3d import X3D, Scene, head, meta, Shape, Box
 
     model = X3D(
-        profile="Interchange", version="4.0",
+        profile="Interchange", version="4.1",
         head=head(children=[meta(name="title", content="Test")]),
         Scene=Scene(children=[Shape(geometry=Box())]),
     )
@@ -28,7 +28,7 @@ def test_workflow_create_scene():
 def test_workflow_create_geometry():
     from x3d.x3d import X3D, Scene, Shape, Appearance, Material, Box
     model = X3D(
-        profile="Interchange", version="4.0",
+        profile="Interchange", version="4.1",
         Scene=Scene(children=[
             Shape(
                 appearance=Appearance(material=Material(diffuseColor=(1, 0, 0))),
@@ -48,7 +48,7 @@ def test_workflow_compose_scene():
         Transform, Viewpoint, DirectionalLight, Background,
     )
     model = X3D(
-        profile="Interchange", version="4.0",
+        profile="Interchange", version="4.1",
         Scene=Scene(children=[
             Background(skyColor=[(0.2, 0.2, 0.4)]),
             Viewpoint(position=(0, 2, 10), description="Main View"),
@@ -145,7 +145,7 @@ def test_query_list_profiles():
 def test_convert_xml_to_json():
     from tools.convert import _parse_xml_to_model
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0">
+<X3D profile="Interchange" version="4.1">
   <Scene>
     <Shape>
       <Appearance>
@@ -164,7 +164,7 @@ def test_convert_xml_to_json():
 def test_convert_xml_to_vrml():
     from tools.convert import _parse_xml_to_model
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0">
+<X3D profile="Interchange" version="4.1">
   <Scene>
     <Shape>
       <Appearance>

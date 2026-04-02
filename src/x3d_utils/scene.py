@@ -181,7 +181,7 @@ class SceneManager:
 
         return X3D(
             profile=self._profile,
-            version="4.0",
+            version="4.1",
             head=h,
             Scene=Scene(children=scene_children),
         )

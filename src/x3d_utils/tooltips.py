@@ -1,7 +1,8 @@
-"""Parser for X3D 4.0 tooltips profile XML.
+"""Parser for X3D tooltips profile XML.
 
 Extracts per-node and per-field tooltip descriptions, authoring hints,
-warnings, spec references, and type annotations from x3d-4.0.profile.xml.
+warnings, spec references, and type annotations.
+Uses x3d-4.0.profile.xml (4.1 profile not yet published by Web3D Consortium).
 """
 
 import re

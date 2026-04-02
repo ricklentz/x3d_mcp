@@ -1,7 +1,7 @@
 """X3D MCP Server.
 
 FastMCP server providing tools for generating, validating, and converting
-valid X3D 4.0 content.
+valid X3D 4.1 content.
 """
 
 import sys

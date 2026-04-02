@@ -161,7 +161,7 @@ def generate_indexed_face_set(
         tex_index_attr = f' texCoordIndex="{index_str}"'
 
     x3d_output = f"""<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0">
+<X3D profile="Interchange" version="4.1">
   <head>
     <meta name="title" content="IndexedFaceSet {mesh_type}"/>
   </head>
@@ -291,7 +291,7 @@ def generate_extrusion(
     color_str = f"{_fmt(color[0])} {_fmt(color[1])} {_fmt(color[2])}"
 
     x3d_output = f"""<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0">
+<X3D profile="Interchange" version="4.1">
   <head>
     <meta name="title" content="Extrusion {spine_type} {cross_type}"/>
   </head>
@@ -412,7 +412,7 @@ def generate_interpolator(
     cycle = _fmt(rng.uniform(2.0, 10.0))
 
     x3d_output = f"""<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Immersive" version="4.0">
+<X3D profile="Immersive" version="4.1">
   <head>
     <meta name="title" content="{node_name} animation"/>
   </head>

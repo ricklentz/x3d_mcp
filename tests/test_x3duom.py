@@ -16,7 +16,7 @@ def test_loads_x3duom():
 def test_concrete_nodes_count():
     uom = get_x3duom()
     nodes = uom.get_concrete_nodes()
-    assert len(nodes) == 260
+    assert len(nodes) == 265
 
 
 def test_box_node():

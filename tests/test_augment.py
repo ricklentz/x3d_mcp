@@ -21,7 +21,7 @@ from dataset.filter import filter_file
 
 
 SAMPLE_X3D = """<?xml version="1.0" encoding="UTF-8"?>
-<X3D profile="Interchange" version="4.0">
+<X3D profile="Interchange" version="4.1">
   <Scene>
     <Transform translation="1.0 2.0 3.0">
       <Shape>

@@ -36,12 +36,12 @@ JSON and ClassicVRML encoding uses `x3d.py`'s built-in `.JSON()` and `.VRML()` s
 Three layers, matching the X3D specification's own validation hierarchy:
 
 1. **Type checking at generation time** -- `x3d.py` enforces field types, ranges, and enumerations during scene construction
-2. **XSD validation** -- `lxml.etree.XMLSchema` against `x3d-4.0.xsd` (bundled with companion schemas)
+2. **XSD validation** -- `lxml.etree.XMLSchema` against `x3d-4.1.xsd` (bundled with companion schemas)
 3. **JSON structural validation** -- checks for required X3D root, @version, @profile, and Scene keys
 
 ### X3DUOM as Foundation
 
-The `X3dUnifiedObjectModel-4.0.xml` (X3DUOM) is the single source of truth for all 260 concrete nodes, 72 abstract types, 87 simple types, and 17 statements. It is parsed at build time to generate:
+The `X3dUnifiedObjectModel-4.1.xml` (X3DUOM) is the single source of truth for all 265 concrete nodes (5 new in 4.1: EnvironmentLight, FontLibrary, HAnimPose, InlineGeometry, Tangent), abstract types, simple types, and statements. It is parsed at build time to generate:
 
 - Node/field metadata lookup tables
 - containerField mapping rules
@@ -66,7 +66,7 @@ x3d_mcp/
       x3duom.py            # X3DUOM parser, node/field metadata
     validation/
       validate.py          # XSD + JSON validation pipeline
-      schemas/             # Bundled x3d-4.0.xsd, x3d-4.0.dtd, X3DUOM
+      schemas/             # Bundled x3d-4.1.xsd, x3d-4.1.dtd, X3DUOM 4.1
   dataset/
     schema.py              # Canonical training example schema, normalization
     normalize.py           # JSONL schema normalization CLI
@@ -177,7 +177,7 @@ python -m dataset.generate output.jsonl \
 
 ## X3D Standard Reference
 
-This server targets **X3D version 4.0** (ISO/IEC 19775-1:2023).
+This server targets **X3D version 4.1** (candidate draft, building on ISO/IEC 19775-1:2023 v4.0).
 
 ### Supported Encodings
 
@@ -240,6 +240,7 @@ The container mounts `src/` and `tests/` from the host. Logs are written to `out
 
 ## External References
 
+- X3D Specification (v4.1 draft): https://www.web3d.org/specifications/X3Dv4Draft/ISO-IEC19775-1v4.1-CD/Part01/Architecture.html
 - X3D Specification (v4.0): https://www.web3d.org/specifications/X3Dv4Draft/ISO-IEC19775-1v4-WD2/Part01/Architecture.html
 - X3D Tooltips (HTML): https://www.web3d.org/x3d/tooltips/X3dTooltips.html
 - X3D Tooltips Profile (XML): https://www.web3d.org/x3d/tooltips/x3d-4.0.profile.xml

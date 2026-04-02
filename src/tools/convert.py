@@ -17,7 +17,7 @@ def _parse_xml_to_model(xml_string: str) -> X3D:
     """Parse X3D XML and rebuild as x3d.py model."""
     root = etree.fromstring(xml_string.encode("utf-8"))
     profile = root.get("profile", "Interchange")
-    version = root.get("version", "4.0")
+    version = root.get("version", "4.1")
 
     head_node = None
     head_el = root.find("head")

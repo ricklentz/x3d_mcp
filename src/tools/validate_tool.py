@@ -14,7 +14,7 @@ def register(mcp: FastMCP):
 
     @mcp.tool()
     def validate_x3d(content: str, encoding: str = "xml") -> str:
-        """Validate X3D content against the X3D 4.0 schema.
+        """Validate X3D content against the X3D 4.1 schema.
 
         Args:
             content: The X3D content string to validate.
@@ -30,7 +30,7 @@ def register(mcp: FastMCP):
 
     @mcp.tool()
     def validate_current_scene() -> str:
-        """Validate the current granular scene against the X3D 4.0 schema."""
+        """Validate the current granular scene against the X3D 4.1 schema."""
         xml_content = _scene.to_xml()
         result = validate_xml(xml_content)
         return json.dumps(result, indent=2)

@@ -1,6 +1,6 @@
 """X3D validation pipeline.
 
-Validates X3D content against the X3D 4.0 XSD schema using lxml.
+Validates X3D content against the X3D 4.1 XSD schema using lxml.
 Supports XML, JSON, and basic structural checks.
 """
 
@@ -10,7 +10,7 @@ from lxml import etree
 
 
 SCHEMAS_DIR = Path(__file__).resolve().parent / "schemas"
-XSD_PATH = SCHEMAS_DIR / "x3d-4.0.xsd"
+XSD_PATH = SCHEMAS_DIR / "x3d-4.1.xsd"
 
 # XSI namespace attribute that x3d.py adds -- must be stripped before validation
 XSI_NS = "https://www.w3.org/2001/XMLSchema-instance"
@@ -19,7 +19,7 @@ _schema = None
 
 
 def _get_schema() -> etree.XMLSchema:
-    """Load and cache the X3D 4.0 XSD schema."""
+    """Load and cache the X3D 4.1 XSD schema."""
     global _schema
     if _schema is not None:
         return _schema

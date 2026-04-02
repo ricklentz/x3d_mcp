@@ -1,6 +1,6 @@
-"""Parser for X3D Unified Object Model (X3DUOM) 4.0.
+"""Parser for X3D Unified Object Model (X3DUOM) 4.1.
 
-Loads X3dUnifiedObjectModel-4.0.xml and provides lookup tables for
+Loads X3dUnifiedObjectModel-4.1.xml and provides lookup tables for
 node types, fields, components, profiles, and field types.
 """
 
@@ -9,7 +9,7 @@ from lxml import etree
 
 
 SCHEMAS_DIR = Path(__file__).resolve().parent.parent / "validation" / "schemas"
-X3DUOM_PATH = SCHEMAS_DIR / "X3dUnifiedObjectModel-4.0.xml"
+X3DUOM_PATH = SCHEMAS_DIR / "X3dUnifiedObjectModel-4.1.xml"
 
 
 class X3DUOM:
